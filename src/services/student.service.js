@@ -1,62 +1,39 @@
 const Student = require('../models/student.model');
-const generateId = require('../utils/idGenerator');
-const { readData, writeData } = require('../utils/fileHandler');
 
-let students = readData(); // in-memory + persisted
-
-const getAllStudents = (query) => {
-  let result = [...students];
-
-  // Search
-  if (query.name) {
-    result = result.filter(s =>
-      s.name.toLowerCase().includes(query.name.toLowerCase())
-    );
+const getAllStudents = async (query) => {
+  const { name, page = 1, limit = 5 } = query;
+  
+  const filter = {};
+  if (name) {
+    filter.name = { $regex: name, $options: 'i' }; // Case-insensitive search
   }
 
-  // Pagination
-  const page = parseInt(query.page) || 1;
-  const limit = parseInt(query.limit) || 5;
-  const start = (page - 1) * limit;
-  const end = start + limit;
-
-  return result.slice(start, end);
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  
+  return await Student.find(filter)
+    .skip(skip)
+    .limit(parseInt(limit))
+    .sort({ createdAt: -1 });
 };
 
-const getStudentById = (id) => {
-  return students.find(s => s.id === id);
+const getStudentById = async (id) => {
+  return await Student.findById(id);
 };
 
-const createStudent = (data) => {
-  const newStudent = new Student({
-    id: generateId(),
-    ...data
+const createStudent = async (data) => {
+  return await Student.create(data);
+};
+
+const updateStudent = async (id, data) => {
+  return await Student.findByIdAndUpdate(id, data, {
+    new: true, // Return the updated document
+    runValidators: true, // Run schema validators on update
   });
-
-  students.push(newStudent);
-  writeData(students);
-
-  return newStudent;
 };
 
-const updateStudent = (id, data) => {
-  const index = students.findIndex(s => s.id === id);
-  if (index === -1) return null;
-
-  students[index] = { ...students[index], ...data };
-  writeData(students);
-
-  return students[index];
-};
-
-const deleteStudent = (id) => {
-  const index = students.findIndex(s => s.id === id);
-  if (index === -1) return false;
-
-  students.splice(index, 1);
-  writeData(students);
-
-  return true;
+const deleteStudent = async (id) => {
+  const student = await Student.findByIdAndDelete(id);
+  return !!student;
 };
 
 module.exports = {

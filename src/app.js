@@ -6,11 +6,16 @@ const notFound = require('./middlewares/notFound.middleware');
 
 const app = express();
 
+// Custom middleware
+app.use(logger);
+
 // Built-in middleware
 app.use(express.json());
 
-// Custom middleware
-app.use(logger);
+// Main Root Route
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the Student Management System API' });
+});
 
 // Routes
 app.use('/api/students', studentRoutes);

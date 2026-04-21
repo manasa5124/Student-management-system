@@ -1,17 +1,17 @@
 const studentService = require('../services/student.service');
 
-exports.getAll = (req, res, next) => {
+exports.getAll = async (req, res, next) => {
   try {
-    const students = studentService.getAllStudents(req.query);
+    const students = await studentService.getAllStudents(req.query);
     res.status(200).json(students);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getById = (req, res, next) => {
+exports.getById = async (req, res, next) => {
   try {
-    const student = studentService.getStudentById(req.params.id);
+    const student = await studentService.getStudentById(req.params.id);
 
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
@@ -23,18 +23,18 @@ exports.getById = (req, res, next) => {
   }
 };
 
-exports.create = (req, res, next) => {
+exports.create = async (req, res, next) => {
   try {
-    const student = studentService.createStudent(req.body);
+    const student = await studentService.createStudent(req.body);
     res.status(201).json(student);
   } catch (err) {
     next(err);
   }
 };
 
-exports.update = (req, res, next) => {
+exports.update = async (req, res, next) => {
   try {
-    const student = studentService.updateStudent(req.params.id, req.body);
+    const student = await studentService.updateStudent(req.params.id, req.body);
 
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
@@ -46,9 +46,9 @@ exports.update = (req, res, next) => {
   }
 };
 
-exports.delete = (req, res, next) => {
+exports.delete = async (req, res, next) => {
   try {
-    const deleted = studentService.deleteStudent(req.params.id);
+    const deleted = await studentService.deleteStudent(req.params.id);
 
     if (!deleted) {
       return res.status(404).json({ message: 'Student not found' });
