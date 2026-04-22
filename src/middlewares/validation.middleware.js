@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
     });
   }
 
-  if (typeof age !== 'number') {
+  if (typeof age !== 'number' && isNaN(parseInt(age))) {
     return res.status(400).json({
       message: 'Age must be a number'
     });

@@ -25,7 +25,12 @@ exports.getById = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const student = await studentService.createStudent(req.body);
+    // Convert age to number if it's a string
+    const studentData = {
+      ...req.body,
+      age: parseInt(req.body.age)
+    };
+    const student = await studentService.createStudent(studentData);
     res.status(201).json(student);
   } catch (err) {
     next(err);
@@ -34,7 +39,12 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const student = await studentService.updateStudent(req.params.id, req.body);
+    // Convert age to number if it's a string
+    const studentData = {
+      ...req.body,
+      age: parseInt(req.body.age)
+    };
+    const student = await studentService.updateStudent(req.params.id, studentData);
 
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });

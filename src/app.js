@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const studentRoutes = require('./routes/student.routes');
 const logger = require('./middlewares/logger.middleware');
 const errorHandler = require('./middlewares/error.middleware');
@@ -6,10 +7,9 @@ const notFound = require('./middlewares/notFound.middleware');
 
 const app = express();
 
-// Custom middleware
+// Middleware
+app.use(cors()); // Enable CORS for all origins
 app.use(logger);
-
-// Built-in middleware
 app.use(express.json());
 
 // Main Root Route
