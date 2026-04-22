@@ -31,6 +31,12 @@ exports.create = async (req, res, next) => {
       age: parseInt(req.body.age)
     };
     const student = await studentService.createStudent(studentData);
+    
+    // Emit WebSocket event
+    if (global.io) {
+      global.io.emit('student:created', student);
+    }
+    
     res.status(201).json(student);
   } catch (err) {
     next(err);
@@ -50,6 +56,11 @@ exports.update = async (req, res, next) => {
       return res.status(404).json({ message: 'Student not found' });
     }
 
+    // Emit WebSocket event
+    if (global.io) {
+      global.io.emit('student:updated', student);
+    }
+
     res.status(200).json(student);
   } catch (err) {
     next(err);
@@ -62,6 +73,11 @@ exports.delete = async (req, res, next) => {
 
     if (!deleted) {
       return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Emit WebSocket event
+    if (global.io) {
+      global.io.emit('student:deleted', { id: req.params.id });
     }
 
     res.status(200).json({ message: 'Deleted successfully' });

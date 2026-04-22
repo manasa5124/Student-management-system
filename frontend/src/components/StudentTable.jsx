@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2, Calendar, Book, User } from 'lucide-react';
+import { Edit2, Trash2, Calendar, Book, User, Image as ImageIcon } from 'lucide-react';
 import Button from './Button';
 
 /**
@@ -18,13 +18,24 @@ const StudentTable = ({ students, onEdit, onDelete }) => {
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {students.map((student) => (
           <div key={student.id} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="flex justify-between items-start mb-4">
-              <div>
+            <div className="flex items-start gap-4 mb-4">
+              {student.image ? (
+                <img
+                  src={student.image}
+                  alt={student.name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-primary-200"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xl">
+                  {student.name.charAt(0)}
+                </div>
+              )}
+              <div className="flex-1">
                 <h3 className="font-bold text-gray-900 text-lg">{student.name}</h3>
                 <p className="text-primary-600 font-medium text-sm">{student.course}</p>
-              </div>
-              <div className="bg-primary-50 px-2 py-1 rounded text-xs font-bold text-primary-700">
-                Age: {student.age}
+                <div className="bg-primary-50 px-2 py-1 rounded text-xs font-bold text-primary-700 inline-block mt-2">
+                  Age: {student.age}
+                </div>
               </div>
             </div>
             
@@ -72,9 +83,17 @@ const StudentTable = ({ students, onEdit, onDelete }) => {
               <tr key={student.id} className="hover:bg-gray-50/50 transition-colors group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
-                      {student.name.charAt(0)}
-                    </div>
+                    {student.image ? (
+                      <img
+                        src={student.image}
+                        alt={student.name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-primary-200"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
+                        {student.name.charAt(0)}
+                      </div>
+                    )}
                     <span className="font-semibold text-gray-900">{student.name}</span>
                   </div>
                 </td>

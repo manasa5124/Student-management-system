@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const studentRoutes = require('./routes/student.routes');
 const authRoutes = require('./routes/auth.routes');
+const uploadRoutes = require('./routes/upload.routes');
 const logger = require('./middlewares/logger.middleware');
 const errorHandler = require('./middlewares/error.middleware');
 const notFound = require('./middlewares/notFound.middleware');
@@ -10,7 +11,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: '*',
+  origin: process.env.FRONTEND_URL || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -20,6 +21,7 @@ app.use(logger);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Simple students endpoint with static data
 app.get('/api/students-simple', (req, res) => {

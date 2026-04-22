@@ -16,6 +16,10 @@ const StudentSchema = new mongoose.Schema({
     required: [true, 'Course is required'],
     trim: true,
   },
+  image: {
+    type: String,
+    default: null, // Cloudinary URL
+  },
   createdAt: {
     type: Date,
     default: Date.now,

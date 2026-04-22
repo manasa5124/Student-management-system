@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from './Button';
-import { User, BookOpen, Hash, CheckCircle } from 'lucide-react';
+import { User, BookOpen, Hash, CheckCircle, Upload, X, Image as ImageIcon } from 'lucide-react';
 
 /**
  * StudentForm Component
@@ -16,13 +16,19 @@ const StudentForm = ({ initialData, onSubmit, isLoading = false }) => {
     name: '',
     age: '',
     course: '',
+    image: null,
   });
 
   const [errors, setErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
+      if (initialData.image) {
+        setImagePreview(initialData.image);
+      }
     }
   }, [initialData]);
 
@@ -38,6 +44,59 @@ const StudentForm = ({ initialData, onSubmit, isLoading = false }) => {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Only JPEG, PNG, and WebP images are allowed');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_URL}/api/upload/image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Upload failed');
+      }
+
+      setFormData((prev) => ({ ...prev, image: data.imageUrl }));
+      setImagePreview(data.imageUrl);
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload image: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({ ...prev, image: null }));
+    setImagePreview(null);
   };
 
   const validate = () => {
@@ -60,6 +119,46 @@ const StudentForm = ({ initialData, onSubmit, isLoading = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-lg mx-auto">
+      {/* Image Upload Section */}
+      <div className="space-y-2">
+        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+          <ImageIcon size={16} className="text-primary-600" /> Profile Image
+        </label>
+        
+        {imagePreview ? (
+          <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-primary-200 bg-gray-50">
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="w-full h-full object-cover"
+            />
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        ) : (
+          <div className="relative w-full h-48 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-all flex flex-col items-center justify-center">
+            <input
+              type="file"
+              id="image"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={handleImageUpload}
+              disabled={uploading}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+            <Upload size={32} className="text-gray-400 mb-2" />
+            <p className="text-sm text-gray-500 font-medium">
+              {uploading ? 'Uploading...' : 'Click to upload image'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">JPEG, PNG, WebP (max 5MB)</p>
+          </div>
+        )}
+      </div>
+
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
           <User size={16} className="text-primary-600" /> Full Name
@@ -116,7 +215,7 @@ const StudentForm = ({ initialData, onSubmit, isLoading = false }) => {
         type="submit"
         className="w-full"
         size="lg"
-        isLoading={isLoading}
+        isLoading={isLoading || uploading}
       >
         <span className="flex items-center gap-2">
           <CheckCircle size={20} />
