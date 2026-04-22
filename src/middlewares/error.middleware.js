@@ -1,9 +1,20 @@
 module.exports = (err, req, res, next) => {
+  // Handle null/undefined error
+  if (!err) {
+    return res.status(500).json({
+      message: 'Unknown error occurred'
+    });
+  }
+
   let error = { ...err };
   error.message = err.message;
 
   // Log to console for dev
-  console.error(err);
+  console.error('Error details:', {
+    message: err.message,
+    stack: err.stack,
+    name: err.name
+  });
 
   // Mongoose bad ObjectId
   if (err.name === 'CastError') {

@@ -25,8 +25,9 @@ export const useStudents = () => {
       setStudents(data);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch students");
-      console.error(err);
+      const msg = err.message || "Failed to connect to server";
+      setError(msg);
+      console.error("Dashboard Fetch Error:", err);
     } finally {
       setLoading(false);
     }

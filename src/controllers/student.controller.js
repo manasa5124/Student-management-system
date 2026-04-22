@@ -2,7 +2,7 @@ const studentService = require('../services/student.service');
 
 exports.getAll = async (req, res, next) => {
   try {
-    const students = await studentService.getAllStudents(req.query);
+    const students = await studentService.getAllStudents(req.query || {});
     res.status(200).json(students);
   } catch (err) {
     next(err);

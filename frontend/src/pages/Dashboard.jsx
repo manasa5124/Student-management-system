@@ -17,10 +17,13 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
+  // Ensure students is an array before filtering
+  const studentList = Array.isArray(students) ? students : [];
+
   // Filter students based on search term
-  const filteredStudents = students.filter(s => 
-    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.course.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStudents = studentList.filter(s => 
+    s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.course?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDelete = async (id) => {
@@ -49,83 +52,90 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen py-10">
-      <div className="container mx-auto px-4 max-w-6xl">
+    <div className="min-h-screen py-12 px-6">
+      <div className="container mx-auto max-w-7xl">
         
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Student Directory</h1>
-            <p className="text-gray-500 mt-1">Manage and monitor all student records in one place.</p>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-8">
+          <div className="space-y-2">
+            <h1 className="text-5xl font-black text-slate-900 tracking-tight">Student Directory</h1>
+            <p className="text-lg text-slate-500 font-medium">Monitoring <span className="text-primary-600 font-bold">{studentList.length}</span> active profiles across all departments.</p>
           </div>
-          <Button onClick={() => navigate('/add')} className="rounded-full shadow-lg shadow-primary-500/20">
-            <Plus size={20} className="mr-2" /> Add New Student
+          <Button onClick={() => navigate('/add')} size="lg" className="rounded-2xl h-14 shadow-xl">
+            <Plus size={24} className="mr-2" /> Add New Student
           </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <StatCard 
             title="Total Students" 
-            value={students.length} 
-            icon={<Users className="text-blue-600" />}
-            color="bg-blue-50"
+            value={studentList.length} 
+            icon={<Users />}
+            color="bg-primary-500/10 text-primary-600"
+            trend="+12% from last month"
           />
           <StatCard 
             title="Active Courses" 
-            value={[...new Set(students.map(s => s.course))].length} 
-            icon={<GraduationCap className="text-purple-600" />}
-            color="bg-purple-50"
+            value={[...new Set(studentList.map(s => s.course))].length} 
+            icon={<GraduationCap />}
+            color="bg-brand-500/10 text-brand-600"
+            trend="High demand in IT"
           />
           <StatCard 
-            title="Recent Updates" 
-            value={Math.min(students.length, 3)} 
-            icon={<Clock className="text-amber-600" />}
-            color="bg-amber-50"
+            title="System Status" 
+            value="Stable" 
+            icon={<Clock />}
+            color="bg-emerald-500/10 text-emerald-600"
+            trend="All services active"
           />
         </div>
 
-        {/* Search & Actions Bar */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-grow">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search by name or course..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-4 focus:ring-primary-500/10 outline-none transition-all placeholder:text-gray-400"
-            />
+        {/* Search & Content */}
+        <div className="glass-card rounded-[2.5rem] overflow-hidden">
+          <div className="p-8 border-b border-white/20 bg-white/30">
+            <div className="relative max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input 
+                type="text" 
+                placeholder="Search students by name or course..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-6 py-4 glass-input rounded-2xl outline-none placeholder:text-slate-400 font-medium"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Data Display */}
-        <div className="relative">
-          {loading ? (
-            <Loader message="Fetching student records..." />
-          ) : filteredStudents.length > 0 ? (
-            <StudentTable 
-              students={filteredStudents} 
-              onEdit={handleEdit} 
-              onDelete={handleDelete} 
-            />
-          ) : (
-            <EmptyState message={searchTerm ? `No results found for "${searchTerm}"` : "Your directory is currently empty."} />
-          )}
+          <div className="p-2">
+            {loading ? (
+              <Loader message="Synchronizing data..." />
+            ) : filteredStudents.length > 0 ? (
+              <StudentTable 
+                students={filteredStudents} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete} 
+              />
+            ) : (
+              <EmptyState message={searchTerm ? `No matching records for "${searchTerm}"` : "The database is currently empty."} />
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center space-x-6 hover:shadow-md transition-shadow">
-    <div className={`w-14 h-14 rounded-2xl ${color} flex items-center justify-center`}>
-      {React.cloneElement(icon, { size: 28 })}
+const StatCard = ({ title, value, icon, color, trend }) => (
+  <div className="glass-card p-8 rounded-[2rem] flex items-center justify-between group hover:scale-[1.02] transition-all duration-500">
+    <div className="space-y-3">
+      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+      <div className="flex items-baseline space-x-2">
+        <h3 className="text-4xl font-black text-slate-900">{value}</h3>
+      </div>
+      <p className="text-xs font-semibold text-slate-400">{trend}</p>
     </div>
-    <div>
-      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{title}</p>
-      <h3 className="text-3xl font-extrabold text-gray-900 mt-1">{value}</h3>
+    <div className={`w-16 h-16 rounded-2xl ${color} flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform duration-500`}>
+      {React.cloneElement(icon, { size: 32, strokeWidth: 2.5 })}
     </div>
   </div>
 );

@@ -36,29 +36,40 @@ const Landing = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden bg-white">
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] bg-primary-50 rounded-full blur-3xl opacity-50"></div>
+      <section className="relative pt-24 pb-40 overflow-hidden">
+        {/* Animated background blobs */}
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-300/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-brand-300/20 rounded-full blur-[120px] animate-pulse delay-1000"></div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center max-w-3xl mx-auto space-y-8">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary-100 text-primary-700 text-sm font-bold tracking-wide uppercase animate-fade-in">
-              The Future of Education
-            </span>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight">
-              Manage Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-indigo-600">Students</span> with Confidence
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <div className="max-w-4xl mx-auto space-y-10">
+            <div className="inline-flex items-center space-x-2 px-6 py-2 rounded-full bg-white/50 backdrop-blur-md border border-white/50 shadow-sm animate-float">
+              <span className="w-2 h-2 rounded-full bg-primary-500 animate-ping"></span>
+              <span className="text-primary-700 text-sm font-bold tracking-widest uppercase">
+                The Future of Education
+              </span>
+            </div>
+            
+            <h1 className="text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] tracking-tighter">
+              Manage Your <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 via-brand-500 to-indigo-600">
+                Student Ecosystem
+              </span>
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-              A modern, intuitive, and high-performance Student Management System built for the next generation of educators.
+            
+            <p className="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
+              A high-performance command center for modern educators. Streamline enrollment, tracking, and analytics in one stunning interface.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
               <Link to="/dashboard">
-                <Button size="lg" className="rounded-full px-10">
-                  Get Started <ArrowRight className="ml-2" size={20} />
+                <Button size="lg" className="rounded-[2rem] px-12 h-16 text-xl shadow-2xl">
+                  Enter Dashboard <ArrowRight className="ml-3" size={24} />
                 </Button>
               </Link>
               <Link to="/add">
-                <Button variant="outline" size="lg" className="rounded-full px-10">
-                  Quick Add
+                <Button variant="secondary" size="lg" className="rounded-[2rem] px-12 h-16 text-xl border-2">
+                  Quick Enroll
                 </Button>
               </Link>
             </div>

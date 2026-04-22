@@ -8,17 +8,35 @@ const notFound = require('./middlewares/notFound.middleware');
 const app = express();
 
 // Middleware
-app.use(cors()); // Enable CORS for all origins
-app.use(logger);
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
+app.use(logger);
+
+// Routes
+app.use('/api/students', studentRoutes);
+
+// Simple students endpoint with static data
+app.get('/api/students-simple', (req, res) => {
+  res.json([
+    { id: '1', name: 'John Doe', age: 20, course: 'Computer Science', createdAt: new Date() },
+    { id: '2', name: 'Jane Smith', age: 22, course: 'Mathematics', createdAt: new Date() },
+    { id: '3', name: 'Bob Johnson', age: 21, course: 'Physics', createdAt: new Date() }
+  ]);
+});
+
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working', timestamp: new Date() });
+});
 
 // Main Root Route
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Student Management System API' });
 });
-
-// Routes
-app.use('/api/students', studentRoutes);
 
 // 404
 app.use(notFound);

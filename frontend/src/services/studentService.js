@@ -1,76 +1,63 @@
-import { mockStudents } from "./MockData";
-
 /**
- * Student Service - Simulates API calls to a backend.
- * 
- * DESIGN PRINCIPLE:
- * By encapsulating data logic in a service, we make the frontend agnostic of the data source.
- * When real APIs are ready, we only need to update this file.
+ * Student Service - Real API integration using Fetch
  */
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/students-simple';
 
-// Simulated database state for this session
-let students = [...mockStudents];
-
-const DELAY = 800; // Simulated network delay in ms
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+  }
+  const text = await response.text();
+  if (!text) {
+    return [];
+  }
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('Failed to parse response:', text);
+    throw new Error('Invalid response from server');
+  }
+};
 
 export const studentService = {
   // GET all students
   getAllStudents: async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([...students]);
-      }, DELAY);
-    });
+    const response = await fetch(API_URL);
+    return handleResponse(response);
   },
 
   // GET student by ID
   getStudentById: async (id) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const student = students.find((s) => s.id === id);
-        if (student) resolve({ ...student });
-        else reject(new Error("Student not found"));
-      }, DELAY);
-    });
+    const response = await fetch(`${API_URL}/${id}`);
+    return handleResponse(response);
   },
 
   // CREATE student
   createStudent: async (studentData) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newStudent = {
-          ...studentData,
-          id: Math.random().toString(36).substr(2, 9),
-          createdAt: new Date().toISOString(),
-        };
-        students = [newStudent, ...students];
-        resolve(newStudent);
-      }, DELAY);
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(studentData),
     });
+    return handleResponse(response);
   },
 
   // UPDATE student
   updateStudent: async (id, updatedData) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const index = students.findIndex((s) => s.id === id);
-        if (index !== -1) {
-          students[index] = { ...students[index], ...updatedData };
-          resolve(students[index]);
-        } else {
-          reject(new Error("Student not found"));
-        }
-      }, DELAY);
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData),
     });
+    return handleResponse(response);
   },
 
   // DELETE student
   deleteStudent: async (id) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        students = students.filter((s) => s.id !== id);
-        resolve({ success: true });
-      }, DELAY);
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'DELETE',
     });
+    return handleResponse(response);
   },
 };
