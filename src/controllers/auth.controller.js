@@ -32,10 +32,24 @@ exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    console.log('Login attempt - Email:', email);
+    console.log('Login attempt - Password length:', password ? password.length : 0);
+
     // We use .select('+password') because it is hidden by default in the model
     const user = await User.findOne({ email }).select('+password');
 
-    if (!user || !(await user.matchPassword(password))) {
+    console.log('Login attempt - User found:', !!user);
+    console.log('Login attempt - Has password:', user ? !!user.password : false);
+    console.log('Login attempt - Stored password length:', user ? user.password.length : 0);
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const isMatch = await user.matchPassword(password);
+    console.log('Login attempt - Password match:', isMatch);
+
+    if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
@@ -44,6 +58,7 @@ exports.login = async (req, res, next) => {
       user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (err) {
+    console.error('Login error:', err);
     next(err);
   }
 };

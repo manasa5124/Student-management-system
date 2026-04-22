@@ -33,7 +33,7 @@ UserSchema.pre('save', async function (next) {
   
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
+  // Don't call next() when using async/await - Mongoose handles it
 });
 
 // Method to compare entered password with hashed password

@@ -26,7 +26,7 @@ module.exports = (err, req, res, next) => {
 
   // Mongoose validation error
   if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message);
+    const message = err.errors ? Object.values(err.errors).map(val => val.message) : err.message;
     return res.status(400).json({
       message
     });

@@ -17,12 +17,20 @@ export const authService = {
   },
 
   login: async (credentials) => {
+    console.log('authService.login - Sending credentials:', credentials);
+    console.log('authService.login - API URL:', `${API_URL}/login`);
+    
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
     });
+    
+    console.log('authService.login - Response status:', response.status);
+    
     const data = await response.json();
+    console.log('authService.login - Response data:', data);
+    
     if (!response.ok) throw new Error(data.message || 'Login failed');
     
     if (data.token) {
